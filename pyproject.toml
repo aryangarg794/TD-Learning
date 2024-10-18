@@ -1,0 +1,17 @@
+[project]
+name = "q-learning"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "gymnasium>=1.0.0",
+    "numpy>=2.1.2",
+    "ipykernel>=6.29.5",
+    "pygame>=2.6.1",
+    "tqdm>=4.66.5",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
