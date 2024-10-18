@@ -500,7 +500,7 @@ requires-dist = [
     { name = "ipykernel", specifier = ">=6.29.5" },
     { name = "numpy", specifier = ">=2.1.2" },
     { name = "pygame", specifier = ">=2.6.1" },
-    { name = "tqdm" },
+    { name = "tqdm", specifier = ">=4.66.5" },
 ]
 
 [[package]]
