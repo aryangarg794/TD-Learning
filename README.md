@@ -4,7 +4,7 @@ This repo implements Q-learning (currently done), SARSA and Expected SARSA on th
 
 -------------------
 
-To run the repo/notebook, download [uv](https://docs.astral.sh/uv/) and run the following command:
+To run the repo, download [uv](https://docs.astral.sh/uv/) and run the following command:
 
 ```bash
 uv venv
@@ -17,3 +17,9 @@ This will install the following packages:
 * Numpy
 * gymnasium
 * tqdm
+
+----- 
+
+<code>train.py</code> trains an agent based on passed CLI parameters.
+
+<code>td_learning.py</code> contains the classes for the different types of agents. 
