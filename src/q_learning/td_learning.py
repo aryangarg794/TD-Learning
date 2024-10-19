@@ -98,8 +98,8 @@ class SARSAAgent(TemporalDifferenceAgent):
 
 class ExpectedSARSAAgent(TemporalDifferenceAgent):
     def __init__(self, **kwargs) -> None:
-        super().__init__(**kwargs)
-        
+        super().__init__(**kwargs)    
+    
     def update(
         self: Self,
         state: Any,
