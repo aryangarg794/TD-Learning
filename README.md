@@ -1,6 +1,6 @@
 ## TD learning implementation
 
-This repo implements Q-learning (currently done), SARSA and Expected SARSA on the cliffwalking reinforcement learning problem. 
+This repo implements Q-learning, SARSA and Expected SARSA (in-progress) on the cliffwalking reinforcement learning problem. 
 
 -------------------
 
@@ -23,3 +23,8 @@ This will install the following packages:
 <code>train.py</code> trains an agent based on passed CLI parameters.
 
 <code>td_learning.py</code> contains the classes for the different types of agents. 
+
+An example of training can be seen below:
+
+![Sample training loop example](media/trainingexample.gif)
+
