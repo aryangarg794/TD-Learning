@@ -1,7 +1,9 @@
 import gymnasium as gym
+import os
 import numpy as np
 
 from abc import abstractmethod
+from datetime import datetime
 from typing import Any, Self, SupportsFloat
 
 class TemporalDifferenceAgent:
@@ -16,6 +18,7 @@ class TemporalDifferenceAgent:
         max_epsilon: float = 0.2
         ) -> None:
         
+        self._agent_name = 'Agent'
         self.env = environ
         self.nr_of_actions = environ.action_space.n #type:ignore
         self.nr_of_states = environ.observation_space.n #type:ignore
@@ -62,10 +65,27 @@ class TemporalDifferenceAgent:
         state: Any
         ) -> np.int64 | int:
         return int(np.argmax(self.q_function[state]))
+    
+    def save(
+        self: Self
+    ) -> None:
+        
+        folder_name = 'agents'
+        
+        if not os.path.exists(folder_name):
+            os.makedirs(folder_name)
+    
+        timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        filename = os.path.join(folder_name, f'{self._agent_name}_{timestamp}.txt')
+        np.savetxt(filename, self.q_function, fmt='%d')
+        print(f"Agent saved as {self._agent_name}_{timestamp}.txt")
+        
 
 class QLearningAgent(TemporalDifferenceAgent):
     def __init__(self, **kwargs) -> None:
         super().__init__(**kwargs)
+        
+        self._agent_name = 'Qlearn'
         
     def update(
         self: Self,
@@ -81,6 +101,8 @@ class QLearningAgent(TemporalDifferenceAgent):
 class SARSAAgent(TemporalDifferenceAgent):
     def __init__(self, **kwargs) -> None:
         super().__init__(**kwargs)
+        
+        self._agent_name = 'SARSA'
         
     def update(
         self: Self,
@@ -99,6 +121,8 @@ class SARSAAgent(TemporalDifferenceAgent):
 class ExpectedSARSAAgent(TemporalDifferenceAgent):
     def __init__(self, **kwargs) -> None:
         super().__init__(**kwargs)    
+        
+        self._agent_name = 'ESARSA'
     
     def update(
         self: Self,
