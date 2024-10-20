@@ -4,7 +4,7 @@ import gymnasium as gym
 import numpy as np
 from tqdm import tqdm
 
-from q_learning.td_learning import QLearningAgent, SARSAAgent
+from q_learning.td_learning import QLearningAgent, SARSAAgent, ExpectedSARSAAgent
 
 agents = {
     'qlearn' : 'Q-Learning',
@@ -49,7 +49,12 @@ elif agent_type == 'sarsa':
                        learning_rate=args.lr) #type:ignore
     
 elif agent_type == 'esarsa':
-    raise RuntimeError('Expected SARSA not implemented yet')
+    # raise RuntimeError('Expected SARSA not implemented yet')
+    agent = ExpectedSARSAAgent(environ=env, n_episodes=num_eps,
+                       epsilon=args.startingepsilon, 
+                       max_epsilon=args.maxepsilon, 
+                       discount_factor=args.discount,
+                       learning_rate=args.lr) #type:ignore
 
 
 if __name__ == '__main__':
@@ -65,7 +70,7 @@ if __name__ == '__main__':
         padding_item = (terminal_width - len(setting_text)) // 2
         print(' ' * padding_item + setting_text) 
     
-    for episode in tqdm(range(num_eps)):
+    for episode in tqdm(range(num_eps), leave=True):
         curr_state, info = env.reset()
         done = False
         

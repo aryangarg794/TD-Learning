@@ -124,6 +124,17 @@ class ExpectedSARSAAgent(TemporalDifferenceAgent):
         
         self._agent_name = 'ESARSA'
     
+    def _epsilon_greedy(
+        self,
+        action: Any
+    ) -> None:
+        if np.random.random() < self.epsilon:
+            transition_model = 1/self.nr_of_actions * np.ones(self.nr_of_actions)
+        else:
+            transition_model = np.zeros(self.nr_of_actions)
+            transition_model[action] = 1.0
+        return transition_model 
+    
     def update(
         self: Self,
         state: Any,
@@ -132,4 +143,11 @@ class ExpectedSARSAAgent(TemporalDifferenceAgent):
         terminated: bool,
         next_state: Any
     ) -> None:
-        pass
+        policy_action = self.epsilon_greedy(next_state)
+        if not terminated:
+            transition_model = self._epsilon_greedy(policy_action)
+        else:
+            transition_model = np.zeros(self.nr_of_actions)
+        
+        policy_reward = sum([transition_model[i] * self.q_function[next_state, i] for i in range(self.nr_of_actions)]) #type:ignore
+        self.q_function[state, action] += self.lr * (reward + self.gamma * policy_reward - self.q_function[state, action])
