@@ -1,6 +1,6 @@
 ## TD learning implementation
 
-This repo implements Q-learning, SARSA and Expected SARSA (in-progress) on the cliffwalking reinforcement learning problem. 
+This repo implements Q-learning, SARSA and Expected SARSA on the cliffwalking reinforcement learning problem. 
 
 -------------------
 
