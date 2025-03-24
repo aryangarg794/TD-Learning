@@ -15,7 +15,7 @@ class TemporalDifferenceAgent:
         learning_rate: float = 0.9,
         discount_factor: float = 0.95,
         random: bool = False,
-        max_epsilon: float = 0.2
+        max_epsilon: float = 0.01
         ) -> None:
         
         self._agent_name = 'Agent'
@@ -54,7 +54,9 @@ class TemporalDifferenceAgent:
         if np.random.random() < self.epsilon:
             action = self.env.action_space.sample()
         else:
-            action = int(np.argmax(self.q_function[state]))
+            arr = self.q_function[state]
+            actions = np.where(arr == arr.max())[0]
+            action = np.random.choice(actions)
         return action 
     
     def decay_epsilon(self: Self) -> None:
@@ -78,7 +80,13 @@ class TemporalDifferenceAgent:
         timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
         filename = os.path.join(folder_name, f'{self._agent_name}_{timestamp}.txt')
         np.savetxt(filename, self.q_function, fmt='%d')
-        print(f"Agent saved as {self._agent_name}_{timestamp}.txt")
+        # print(f"Agent saved as {self._agent_name}_{timestamp}.txt")
+        
+    def load(
+        self: Self, 
+        fname: str
+    ) -> None:
+        self.q_function = np.loadtxt(fname)
         
 
 class QLearningAgent(TemporalDifferenceAgent):
@@ -151,3 +159,41 @@ class ExpectedSARSAAgent(TemporalDifferenceAgent):
         
         policy_reward = sum([transition_model[i] * self.q_function[next_state, i] for i in range(self.nr_of_actions)]) #type:ignore
         self.q_function[state, action] += self.lr * (reward + self.gamma * policy_reward - self.q_function[state, action])
+
+class DoubleQAgent(TemporalDifferenceAgent):
+    
+    def __init__(self, **kwargs) -> None:
+        super().__init__(**kwargs)
+        
+        self._agent_name = 'DoubleQ'
+        self.q1 = QLearningAgent(**kwargs)
+        self.q2 = QLearningAgent(**kwargs)
+        
+        self.n_sa = np.zeros((2, self.nr_of_states, self.nr_of_actions))
+        
+    def update(
+        self: Self, 
+        state: Any,
+        action: Any,
+        reward: SupportsFloat | int, 
+        terminated: bool,
+        next_state: Any
+    ) -> None:
+        func = np.random.choice([0, 1])
+        # self.update_lr(state, action, func)
+        
+        if func == 0:
+            greedy_action = np.argmax(self.q1.q_function[next_state]) if not terminated else 0
+            self.q1.q_function[state, action] += self.lr * (reward + self.gamma * self.q2.q_function[next_state, greedy_action] \
+                - self.q1.q_function[state, action])
+        else: 
+            greedy_action = np.argmax(self.q2.q_function[next_state]) if not terminated else 0
+            self.q2.q_function[state, action] += self.lr * (reward + self.gamma * self.q1.q_function[next_state, greedy_action] \
+                - self.q2.q_function[state, action])
+            
+        self.q_function = (self.q1.q_function + self.q2.q_function) / 2
+    
+    def update_lr(self, state: Any, action: Any, func: int) -> None:
+        self.lr = 1/(self.n_sa[func, state, action])**0.8 if self.n_sa[func, state, action] > 0 else self.lr
+        self.n_sa[func, state, action] += 1
+        
